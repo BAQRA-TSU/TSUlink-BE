@@ -51,8 +51,11 @@ namespace TSUApplicationApi.Services
             var hashedPassword = new PasswordHasher<User>()
               .HashPassword(user, request.Password);
 
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
             user.Username = request.Username;
             user.PasswordHash = hashedPassword;
+            
 
             context.Users.Add(user);
 
