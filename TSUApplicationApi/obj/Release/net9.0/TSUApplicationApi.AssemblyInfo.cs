@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TSUApplicationApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+425e091fe709a3dbed6acf72b89222a787cdc5c6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91ff022886df6527446fad72d481b8dad5a9ed45")]
 [assembly: System.Reflection.AssemblyProductAttribute("TSUApplicationApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TSUApplicationApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
