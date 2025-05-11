@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "ODc5zdGOeYG5f9T3YHLD2TGibpvri/ym53FewoRU4pQ=",
+  "Source": "TSUApplicationApi",
+  "BasePath": "_content/TSUApplicationApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
