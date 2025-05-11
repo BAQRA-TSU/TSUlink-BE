@@ -1,0 +1,6 @@
+@TSUApplicationApi_HostAddress = http://localhost:5063
+
+GET {{TSUApplicationApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
