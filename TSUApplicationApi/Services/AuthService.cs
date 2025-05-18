@@ -13,20 +13,19 @@ namespace TSUApplicationApi.Services
 {
     public class AuthService(ApplicationDbContext context, IConfiguration configuration) : IAuthService
     {
-        public async Task<TokenResponseDto> LoginAsync(UserDto request)
+        public async Task<TokenResponseDto> LoginAsync(LoginUserDto request)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
             if (user is null)
             {
                 return null;
             }
+
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password)
                 == PasswordVerificationResult.Failed)
-
             {
                 return null;
             }
-
 
             return await CreateTokenResponse(user);
         }
@@ -40,7 +39,7 @@ namespace TSUApplicationApi.Services
             };
         }
 
-        public async Task<User?> RegisterAsync(UserDto request)
+        public async Task<User?> RegisterAsync(RegisterUserDto request)
         {
             if (await context.Users.AnyAsync(u => u.Username == request.Username))
             {
@@ -48,17 +47,14 @@ namespace TSUApplicationApi.Services
             }
 
             var user = new User();
-            var hashedPassword = new PasswordHasher<User>()
-              .HashPassword(user, request.Password);
+            var hashedPassword = new PasswordHasher<User>().HashPassword(user, request.Password);
 
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.Username = request.Username;
             user.PasswordHash = hashedPassword;
-            
 
             context.Users.Add(user);
-
             await context.SaveChangesAsync();
 
             return user;

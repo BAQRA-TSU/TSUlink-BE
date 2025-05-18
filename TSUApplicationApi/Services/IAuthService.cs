@@ -5,8 +5,8 @@ namespace TSUApplicationApi.Services
 {
     public interface IAuthService
     {
-        Task<User?> RegisterAsync(UserDto request);
-        Task<TokenResponseDto?> LoginAsync(UserDto request);
+        Task<User?> RegisterAsync(RegisterUserDto request);
+        Task<TokenResponseDto?> LoginAsync(LoginUserDto request);
         Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request);
     }
 }
