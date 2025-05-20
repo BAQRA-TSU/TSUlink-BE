@@ -47,5 +47,16 @@ namespace TSUApplicationApi.Services
                     .ToList()
             };
         }
+
+        public async Task<bool> LecturerExistsAsync(int lecturerId)
+        {
+            return await _context.Lecturers.AnyAsync(l => l.Id == lecturerId);
+        }
+
+        public async Task AddReviewAsync(LecturerReview review)
+        {
+            _context.LecturerReviews.Add(review);
+            await _context.SaveChangesAsync();
+        }
     }
 }

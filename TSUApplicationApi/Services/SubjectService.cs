@@ -72,6 +72,16 @@ namespace TSUApplicationApi.Services
 
             return dto;
         }
+        public async Task<bool> SubjectExistsAsync(int subjectId)
+        {
+            return await _context.Subjects.AnyAsync(l => l.Id == subjectId);
+        }
+
+        public async Task AddReviewAsync(SubjectReview review)
+        {
+            _context.SubjectReviews.Add(review);
+            await _context.SaveChangesAsync();
+        }
 
     }
 }

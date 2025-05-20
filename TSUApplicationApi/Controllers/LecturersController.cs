@@ -31,5 +31,30 @@ namespace TSUApplicationApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("review")]
+        public async Task<IActionResult> PostReview([FromBody] CreateLecturerReviewDto dto)
+        {
+            // მომხმარებლის ID მიღება JWT-დან
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
+                return Unauthorized();
+
+            var lecturerExists = await _service.LecturerExistsAsync(dto.LecturerId);
+            if (!lecturerExists)
+                return NotFound("Lecturer not found");
+
+            var review = new LecturerReview
+            {
+                LecturerId = dto.LecturerId,
+                UserId = parsedUserId,
+                Text = dto.Text
+            };
+
+            await _service.AddReviewAsync(review);
+
+            return Ok("Review saved successfully");
+        }
     }
 }
