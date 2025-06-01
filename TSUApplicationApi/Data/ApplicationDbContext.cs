@@ -13,6 +13,8 @@ namespace TSUApplicationApi.Data
         public DbSet<SubjectReview> SubjectReviews { get; set; }
         public DbSet<LecturerReview> LecturerReviews { get; set; }
         public DbSet<LecturerSubject> LecturerSubjects { get; set; }
+        public DbSet<FeedPost> FeedPosts { get; set; }
+        public DbSet<FeedComment> FeedComments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +40,16 @@ namespace TSUApplicationApi.Data
              .HasOne(r => r.User)
              .WithMany()
              .HasForeignKey(r => r.UserId); // 🟢 FK ხელით გაწყვეტ
+
+            modelBuilder.Entity<FeedComment>()
+        .HasOne(c => c.User)
+        .WithMany()
+        .HasForeignKey(c => c.UserId);
+
+            modelBuilder.Entity<FeedComment>()
+                .HasOne(c => c.FeedPost)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.FeedPostId);
         }
     }
 }

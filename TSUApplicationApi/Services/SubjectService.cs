@@ -15,7 +15,7 @@ namespace TSUApplicationApi.Services
             _context = context;
         }
 
-        public async Task<SubjectDetailDto?> GetByShortNameAsync(string shortName)
+        public async Task<SubjectDetailDto?> GetByIdAsync(int id)
         {
             var subject = await _context.Subjects
                 .Include(s => s.LecturerSubjects)
@@ -23,7 +23,7 @@ namespace TSUApplicationApi.Services
                 //.Include(s => s.Files)
                 .Include(s => s.SubjectReviews)
                 .ThenInclude(r => r.User)
-                .FirstOrDefaultAsync(s => s.ShortName == shortName);
+                .FirstOrDefaultAsync(l => l.Id == id);
 
             if (subject == null)
                 return null;
@@ -36,7 +36,7 @@ namespace TSUApplicationApi.Services
                 //Reviews = _mapper.Map<List<ReviewDto>>(subject.Reviews),
                 Reviews = subject.SubjectReviews.Select(r => new ReviewDto
                 {
-                    Name = r.User.Username, // მიმოხილვის ავტორის სრული სახელი
+                    Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
                     Review = r.Text          // მიმოხილვის ტექსტი
                 }).ToList(),
                 Lecturers = new LecturerGroupedDto

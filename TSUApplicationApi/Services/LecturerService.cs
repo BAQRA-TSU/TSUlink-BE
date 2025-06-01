@@ -34,7 +34,8 @@ namespace TSUApplicationApi.Services
                     .Select(ls => new SubjectItemDto
                     {
                         Name = ls.Subject.Name,
-                        ShortName = ls.Subject.ShortName
+                        Id = ls.LecturerId
+                        //ShortName = ls.Subject.ShortName
                     }).ToList(),
                 Information = new ContactInfoDto
                 {
@@ -43,7 +44,7 @@ namespace TSUApplicationApi.Services
                     Office = lecturer.Office
                 },
                 Reviews = lecturer.LecturerReviews
-                    .Select(r => new ReviewDto { Name = r.User.Username, Review = r.Text })
+                    .Select(r => new ReviewDto { Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text })
                     .ToList()
             };
         }

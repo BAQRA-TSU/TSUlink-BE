@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TSUApplicationApi.Data;
 
@@ -11,9 +12,11 @@ using TSUApplicationApi.Data;
 namespace TSUApplicationApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250531151532_AddFeedPostsTable")]
+    partial class AddFeedPostsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,36 +40,6 @@ namespace TSUApplicationApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("TSUApplicationApi.Entities.FeedComment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("FeedPostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FeedPostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FeedComments");
                 });
 
             modelBuilder.Entity("TSUApplicationApi.Entities.FeedPost", b =>
@@ -306,25 +279,6 @@ namespace TSUApplicationApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TSUApplicationApi.Entities.FeedComment", b =>
-                {
-                    b.HasOne("TSUApplicationApi.Entities.FeedPost", "FeedPost")
-                        .WithMany("Comments")
-                        .HasForeignKey("FeedPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TSUApplicationApi.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FeedPost");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TSUApplicationApi.Entities.FeedPost", b =>
                 {
                     b.HasOne("TSUApplicationApi.Entities.User", "User")
@@ -427,11 +381,6 @@ namespace TSUApplicationApi.Migrations
             modelBuilder.Entity("TSUApplicationApi.Entities.Category", b =>
                 {
                     b.Navigation("Semesters");
-                });
-
-            modelBuilder.Entity("TSUApplicationApi.Entities.FeedPost", b =>
-                {
-                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("TSUApplicationApi.Entities.Lecturer", b =>

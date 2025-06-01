@@ -22,10 +22,10 @@ namespace TSUApplicationApi.Controllers
             _service = service;
         }
 
-        [HttpGet("{shortName}")]
-        public async Task<IActionResult> GetSubject(string shortName)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSubject(int id)
         {
-            var result = await _service.GetByShortNameAsync(shortName);
+            var result = await _service.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
 

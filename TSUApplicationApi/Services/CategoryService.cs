@@ -31,7 +31,8 @@ namespace TSUApplicationApi.Services
                     Items = s.Subjects.Select(sub => new SubjectItemDto
                     {
                         Name = sub.Name,
-                        ShortName = sub.ShortName
+                        //ShortName = sub.ShortName
+                        Id = sub.Id,
                     }).ToList()
                 }).ToList()
             }).ToList();

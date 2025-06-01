@@ -5,7 +5,7 @@ namespace TSUApplicationApi.Services
 {
     public interface ISubjectService
     {
-        Task<SubjectDetailDto> GetByShortNameAsync(string shortName);
+        Task<SubjectDetailDto> GetByIdAsync(int id);
         Task AddReviewAsync(SubjectReview review);
         Task<bool> SubjectExistsAsync(int subjectId);
     }
