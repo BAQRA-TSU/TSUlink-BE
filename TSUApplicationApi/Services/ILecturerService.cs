@@ -8,5 +8,6 @@ namespace TSUApplicationApi.Services
         Task<LecturerDetailDto> GetByIdAsync(int id);
         Task AddReviewAsync(LecturerReview review);
         Task<bool> LecturerExistsAsync(int lecturerId);
+        Task<User?> GetUserByIdAsync(Guid userId);
     }
 }

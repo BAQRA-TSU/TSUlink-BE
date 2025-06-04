@@ -82,6 +82,10 @@ namespace TSUApplicationApi.Services
             _context.SubjectReviews.Add(review);
             await _context.SaveChangesAsync();
         }
+        public async Task<User?> GetUserByIdAsync(Guid userId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
 
     }
 }

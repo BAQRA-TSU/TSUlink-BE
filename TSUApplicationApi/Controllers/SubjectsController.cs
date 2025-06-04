@@ -45,6 +45,10 @@ namespace TSUApplicationApi.Controllers
             if (!lecturerExists)
                 return NotFound("Lecturer not found");
 
+            var user = await _service.GetUserByIdAsync(parsedUserId);
+            if (user == null)
+                return Unauthorized();
+
             var review = new SubjectReview
             {
                 SubjectId = dto.SubjectId,
@@ -54,7 +58,14 @@ namespace TSUApplicationApi.Controllers
 
             await _service.AddReviewAsync(review);
 
-            return Ok("Review saved successfully");
+            var reviewDto = new ReviewDto
+            {
+                Name = $"{user.FirstName} {user.LastName}",
+                Review = review.Text
+            };
+
+            return Ok(reviewDto);
+            //return Ok("Review saved successfully");
         }
     }
 }
