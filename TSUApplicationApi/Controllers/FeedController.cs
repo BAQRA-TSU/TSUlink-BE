@@ -42,6 +42,7 @@ namespace TSUApplicationApi.Controllers
 
             var feedPostDto = new FeedPostDto
             {
+                Id = post.Id,
                 Name = $"{user.FirstName} {user.LastName}",
                 Text = post.Content,
             };
