@@ -43,7 +43,7 @@ namespace TSUApplicationApi.Controllers
             var feedPostDto = new FeedPostDto
             {
                 Name = $"{user.FirstName} {user.LastName}",
-                Content = post.Content,
+                Text = post.Content,
             };
             return Ok(feedPostDto);
             //return Ok("Post created successfully");
