@@ -32,20 +32,20 @@ namespace TSUApplicationApi.Services
                 .Select(p => new FeedPostWithCommentsDto
                 {
                     Id = p.Id,
-                    Name = p.User.Username,
+                    Name = p.User.FirstName + " " + p.User.LastName, 
                     Text = p.Content,
                     Comments = p.Comments
                         .OrderBy(c => c.CreatedAt)
                         .Select(c => new FeedCommentDto
                         {
-                            Name = c.User.Username,
+                            Name = c.User.FirstName + " " + c.User.LastName,
                             Text = c.Text
                         }).ToList()
                 })
                 .ToListAsync();
         }
 
-        public async Task AddCommentAsync(int postId, Guid userId, string text)
+        public async Task<FeedComment> AddCommentAsync(int postId, Guid userId, string text)
         {
             var comment = new FeedComment
             {
@@ -57,6 +57,14 @@ namespace TSUApplicationApi.Services
 
             _context.FeedComments.Add(comment);
             await _context.SaveChangesAsync();
+
+            return await _context.FeedComments
+        .Include(c => c.User)
+        .FirstOrDefaultAsync(c => c.Id == comment.Id);
+        }
+        public async Task<User?> GetUserByIdAsync(Guid userId)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
     }
 }

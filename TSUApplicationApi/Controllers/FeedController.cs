@@ -27,6 +27,10 @@ namespace TSUApplicationApi.Controllers
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
                 return Unauthorized();
 
+            var user = await _service.GetUserByIdAsync(parsedUserId);
+            if (user == null)
+                return Unauthorized();
+
             var post = new FeedPost
             {
                 Content = dto.Content,
@@ -36,7 +40,13 @@ namespace TSUApplicationApi.Controllers
 
             await _service.AddPostAsync(post);
 
-            return Ok("Post created successfully");
+            var feedPostDto = new FeedPostDto
+            {
+                Name = $"{user.FirstName} {user.LastName}",
+                Content = post.Content,
+            };
+            return Ok(feedPostDto);
+            //return Ok("Post created successfully");
         }
 
         [HttpGet("with-comments")]
@@ -54,8 +64,18 @@ namespace TSUApplicationApi.Controllers
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var parsedUserId))
                 return Unauthorized();
 
-            await _service.AddCommentAsync(postId, parsedUserId, dto.Text);
-            return Ok("Comment added successfully");
+            var user = await _service.GetUserByIdAsync(parsedUserId);
+            if (user == null)
+                return Unauthorized();
+
+            //await _service.AddCommentAsync(postId, parsedUserId, dto.Text);
+
+            var comment = await _service.AddCommentAsync(postId, parsedUserId, dto.Text);
+            return Ok(new FeedCommentDto
+            {
+                Name = comment.User.FirstName + " " + comment.User.LastName,
+                Text = comment.Text
+            });
         }
     }
 }
