@@ -9,5 +9,6 @@ namespace TSUApplicationApi.Services
         Task AddReviewAsync(SubjectReview review);
         Task<bool> SubjectExistsAsync(int subjectId);
         Task<User?> GetUserByIdAsync(Guid userId);
+        Task<(bool Success, string Message, string FileName)> UploadFileAsync(int subjectId, IFormFile file);
     }
 }

@@ -15,13 +15,17 @@ namespace TSUApplicationApi.Data
         public DbSet<LecturerSubject> LecturerSubjects { get; set; }
         public DbSet<FeedPost> FeedPosts { get; set; }
         public DbSet<FeedComment> FeedComments { get; set; }
+        public DbSet<SubjectFile> SubjectFiles { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<SubjectFile>().ToTable("SubjectFile");
+
             modelBuilder.Entity<LecturerSubject>()
-                .HasKey(ls => new { ls.LecturerId, ls.SubjectId, ls.Type }); // 🔧 დამატებულია Type
+                .HasKey(ls => new { ls.LecturerId, ls.SubjectId, ls.Type }); //  Type
 
             modelBuilder.Entity<LecturerSubject>()
                 .HasOne(ls => ls.Lecturer)
@@ -50,6 +54,8 @@ namespace TSUApplicationApi.Data
                 .HasOne(c => c.FeedPost)
                 .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.FeedPostId);
+
         }
+
     }
 }

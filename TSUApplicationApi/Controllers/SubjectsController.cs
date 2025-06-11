@@ -67,5 +67,17 @@ namespace TSUApplicationApi.Controllers
             return Ok(reviewDto);
             //return Ok("Review saved successfully");
         }
+
+        [HttpPost("{subjectId}/upload")]
+        public async Task<IActionResult> UploadFile(int subjectId, IFormFile file)
+        {
+            var result = await _service.UploadFileAsync(subjectId, file);
+
+            if (!result.Success)
+                return BadRequest(result.Message);
+
+            return Ok(new { result.FileName });
+        }
+
     }
 }

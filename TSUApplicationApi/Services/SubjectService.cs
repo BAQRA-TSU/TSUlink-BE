@@ -9,10 +9,11 @@ namespace TSUApplicationApi.Services
     public class SubjectService : ISubjectService
     {
         private readonly ApplicationDbContext _context;
-
-        public SubjectService(ApplicationDbContext context)
+        private readonly IWebHostEnvironment _environment;
+        public SubjectService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         public async Task<SubjectDetailDto?> GetByIdAsync(int id)
@@ -23,10 +24,12 @@ namespace TSUApplicationApi.Services
                 //.Include(s => s.Files)
                 .Include(s => s.SubjectReviews)
                 .ThenInclude(r => r.User)
+                .Include(s => s.Files)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (subject == null)
                 return null;
+
 
             var dto = new SubjectDetailDto
             {
@@ -34,6 +37,13 @@ namespace TSUApplicationApi.Services
                 Description = subject.Description,
                 //Files = _mapper.Map<List<FileDto>>(subject.Files),
                 //Reviews = _mapper.Map<List<ReviewDto>>(subject.Reviews),
+
+                Files = subject.Files.Select(f => new FileDto
+                {
+                    FileName = f.FileName,
+                    FileUrl = $"/uploads/subjects/{f.FileName}"
+                }).ToList(),
+
                 Reviews = subject.SubjectReviews.Select(r => new ReviewDto
                 {
                     Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
@@ -72,6 +82,7 @@ namespace TSUApplicationApi.Services
 
             return dto;
         }
+
         public async Task<bool> SubjectExistsAsync(int subjectId)
         {
             return await _context.Subjects.AnyAsync(l => l.Id == subjectId);
@@ -86,6 +97,41 @@ namespace TSUApplicationApi.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
+
+        public async Task<(bool Success, string Message, string FileName)> UploadFileAsync(int subjectId, IFormFile file)
+        {
+            Console.WriteLine($"WebRootPath: {_environment.WebRootPath}");
+            if (file == null || file.Length == 0)
+                return (false, "No file uploaded.", null);
+
+            var subject = await _context.Subjects.FindAsync(subjectId);
+            if (subject == null)
+                return (false, "Subject not found.", null);
+
+            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "subjects");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var subjectFile = new SubjectFile
+            {
+                FileName = uniqueFileName,
+                SubjectId = subjectId
+            };
+
+            _context.SubjectFiles.Add(subjectFile);
+            await _context.SaveChangesAsync();
+
+            return (true, "File uploaded successfully.", uniqueFileName);
+        }
+
+
 
     }
 }
