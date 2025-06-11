@@ -68,15 +68,37 @@ namespace TSUApplicationApi.Controllers
             //return Ok("Review saved successfully");
         }
 
-        [HttpPost("{subjectId}/upload")]
-        public async Task<IActionResult> UploadFile(int subjectId, IFormFile file)
+        //[HttpPost("{subjectId}/upload")]
+        //public async Task<IActionResult> UploadFile(int subjectId, IFormFile file)
+        //{
+        //    var result = await _service.UploadFileAsync(subjectId, file);
+
+        //    if (!result.Success)
+        //        return BadRequest(result.Message);
+
+        //    return Ok(new { result.FileName });
+        //}
+
+        [HttpPost("{subjectId}/upload-db")]
+        public async Task<IActionResult> UploadFileToDb(int subjectId, IFormFile file)
         {
-            var result = await _service.UploadFileAsync(subjectId, file);
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
 
-            if (!result.Success)
-                return BadRequest(result.Message);
+            var (success, message, uploadedFile) = await _service.UploadFileAsync(subjectId, file);
+            if (!success)
+                return BadRequest(message);
 
-            return Ok(new { result.FileName });
+            return Ok(uploadedFile); 
+        }
+        [HttpGet("{subjectId}/files/{fileId}")]
+        public async Task<IActionResult> DownloadFileFromDb(int subjectId, int fileId)
+        {
+            var file = await _service.DownloadFileAsync(fileId, subjectId);
+            if (file == null)
+                return NotFound("File not found.");
+
+            return File(file.FileContent, file.ContentType, file.FileName);
         }
 
     }

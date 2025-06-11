@@ -41,7 +41,7 @@ namespace TSUApplicationApi.Services
                 Files = subject.Files.Select(f => new FileDto
                 {
                     FileName = f.FileName,
-                    FileUrl = $"/uploads/subjects/{f.FileName}"
+                    FileUrl = $"/api/subjects/{subject.Id}/files/{f.Id}"
                 }).ToList(),
 
                 Reviews = subject.SubjectReviews.Select(r => new ReviewDto
@@ -98,9 +98,41 @@ namespace TSUApplicationApi.Services
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
-        public async Task<(bool Success, string Message, string FileName)> UploadFileAsync(int subjectId, IFormFile file)
+        //public async Task<(bool Success, string Message, string FileName)> UploadFileAsync(int subjectId, IFormFile file)
+        //{
+        //    Console.WriteLine($"WebRootPath: {_environment.WebRootPath}");
+        //    if (file == null || file.Length == 0)
+        //        return (false, "No file uploaded.", null);
+
+        //    var subject = await _context.Subjects.FindAsync(subjectId);
+        //    if (subject == null)
+        //        return (false, "Subject not found.", null);
+
+        //    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "subjects");
+        //    Directory.CreateDirectory(uploadsFolder);
+
+        //    var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+        //    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //    using (var stream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        await file.CopyToAsync(stream);
+        //    }
+
+        //    var subjectFile = new SubjectFile
+        //    {
+        //        FileName = uniqueFileName,
+        //        SubjectId = subjectId
+        //    };
+
+        //    _context.SubjectFiles.Add(subjectFile);
+        //    await _context.SaveChangesAsync();
+
+        //    return (true, "File uploaded successfully.", uniqueFileName);
+        //}
+
+        public async Task<(bool Success, string Message, FileDto? File)> UploadFileAsync(int subjectId, IFormFile file)
         {
-            Console.WriteLine($"WebRootPath: {_environment.WebRootPath}");
             if (file == null || file.Length == 0)
                 return (false, "No file uploaded.", null);
 
@@ -108,28 +140,57 @@ namespace TSUApplicationApi.Services
             if (subject == null)
                 return (false, "Subject not found.", null);
 
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "subjects");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+            var fileBytes = memoryStream.ToArray();
 
             var subjectFile = new SubjectFile
             {
-                FileName = uniqueFileName,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                FileContent = fileBytes,
                 SubjectId = subjectId
             };
 
             _context.SubjectFiles.Add(subjectFile);
             await _context.SaveChangesAsync();
 
-            return (true, "File uploaded successfully.", uniqueFileName);
+            var fileDto = new FileDto
+            {
+                FileName = file.FileName,
+                FileUrl = $"/api/subjects/{subjectId}/files/{subjectFile.Id}" 
+            };
+
+            return (true, "File uploaded successfully.", fileDto);
         }
+
+        //public async Task<(byte[] FileData, string FileName, string ContentType)?> DownloadFileAsync(int fileId)
+        //{
+        //    var file = await _context.SubjectFiles.FindAsync(fileId);
+        //    if (file == null)
+        //        return null;
+
+        //    return (file.FileContent, file.FileName, file.ContentType);
+        //}
+
+        //public async Task AddFileAsync(SubjectFile file)
+        //{
+        //    _context.SubjectFiles.Add(file);
+        //    await _context.SaveChangesAsync();
+        //}
+
+        //public async Task<SubjectFile?> GetFileByIdAsync(int fileId, int subjectId)
+        //{
+        //    return await _context.SubjectFiles
+        //        .FirstOrDefaultAsync(f => f.Id == fileId && f.SubjectId == subjectId);
+        //}
+
+        public async Task<SubjectFile?> DownloadFileAsync(int fileId, int subjectId)
+        {
+            return await _context.SubjectFiles
+                .FirstOrDefaultAsync(f => f.Id == fileId && f.SubjectId == subjectId);
+        }
+
 
 
 

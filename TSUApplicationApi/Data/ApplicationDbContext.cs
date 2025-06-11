@@ -15,7 +15,7 @@ namespace TSUApplicationApi.Data
         public DbSet<LecturerSubject> LecturerSubjects { get; set; }
         public DbSet<FeedPost> FeedPosts { get; set; }
         public DbSet<FeedComment> FeedComments { get; set; }
-        public DbSet<SubjectFile> SubjectFiles { get; set; }
+        public DbSet<SubjectFile> SubjectFiles { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
