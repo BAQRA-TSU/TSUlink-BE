@@ -14,5 +14,7 @@
 
         public Guid UserId { get; set; }
         public User User { get; set; }   // User entity-სთან კავშირი
+
+        public bool IsApproved { get; set; } = false;
     }
 }

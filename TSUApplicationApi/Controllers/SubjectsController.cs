@@ -101,5 +101,30 @@ namespace TSUApplicationApi.Controllers
             return File(file.FileContent, file.ContentType, file.FileName);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost("review/{reviewId}/approve")]
+        public async Task<IActionResult> ApproveSubjectReview(int reviewId)
+        {
+            var review = await _service.GetSubjectReviewByIdAsync(reviewId);
+            if (review == null)
+                return NotFound();
+
+            review.IsApproved = true;
+            await _service.UpdateSubjectReviewAsync(review);
+
+            return Ok("Review approved.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("review/{reviewId}")]
+        public async Task<IActionResult> DeleteSubjectReview(int reviewId)
+        {
+            var success = await _service.DeleteSubjectReviewAsync(reviewId);
+            if (!success)
+                return NotFound();
+
+            return Ok("Review deleted.");
+        }
+
     }
 }

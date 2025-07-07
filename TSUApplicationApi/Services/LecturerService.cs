@@ -31,11 +31,12 @@ namespace TSUApplicationApi.Services
             {
                 Name = lecturer.FullName,
                 Subjects = lecturer.LecturerSubjects
-                    .Select(ls => new SubjectItemDto
+                    .GroupBy(ls => ls.Subject.Id)
+                    .Select(g => g.First().Subject)
+                    .Select(subject => new SubjectItemDto
                     {
-                        Name = ls.Subject.Name,
-                        Id = ls.LecturerId
-                        //ShortName = ls.Subject.ShortName
+                        Id = subject.Id,
+                        Name = subject.Name
                     }).ToList(),
                 Information = new ContactInfoDto
                 {
@@ -44,6 +45,7 @@ namespace TSUApplicationApi.Services
                     Office = lecturer.Office
                 },
                 Reviews = lecturer.LecturerReviews
+                    .Where(r => r.IsApproved)
                     .Select(r => new ReviewDto { Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text })
                     .ToList()
             };
@@ -63,5 +65,26 @@ namespace TSUApplicationApi.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
+        //-----------------------------------------
+
+        public async Task<LecturerReview?> GetLecturerReviewByIdAsync(int reviewId)
+    => await _context.LecturerReviews.FindAsync(reviewId);
+
+        public async Task UpdateLecturerReviewAsync(LecturerReview review)
+        {
+            _context.LecturerReviews.Update(review);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteLecturerReviewAsync(int reviewId)
+        {
+            var review = await _context.LecturerReviews.FindAsync(reviewId);
+            if (review == null) return false;
+
+            _context.LecturerReviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

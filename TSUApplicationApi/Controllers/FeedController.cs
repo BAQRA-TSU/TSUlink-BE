@@ -78,5 +78,51 @@ namespace TSUApplicationApi.Controllers
                 Text = comment.Text
             });
         }
+         //------------------------------//
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{postId}/approve")]
+        public async Task<IActionResult> ApprovePost(int postId)
+        {
+            var post = await _service.GetPostByIdAsync(postId);
+            if (post == null) return NotFound();
+
+            post.IsApproved = true;
+            await _service.UpdatePostAsync(post);
+            return Ok("Post approved.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{postId}")]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            var success = await _service.DeletePostAsync(postId);
+            if (!success) return NotFound();
+
+            return Ok("Post deleted.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("comments/{commentId}/approve")]
+        public async Task<IActionResult> ApproveComment(int commentId)
+        {
+            var comment = await _service.GetCommentByIdAsync(commentId);
+            if (comment == null) return NotFound();
+
+            comment.IsApproved = true;
+            await _service.UpdateCommentAsync(comment);
+            return Ok("Comment approved.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int commentId)
+        {
+            var success = await _service.DeleteCommentAsync(commentId);
+            if (!success) return NotFound();
+
+            return Ok("Comment deleted.");
+        }
+
     }
 }

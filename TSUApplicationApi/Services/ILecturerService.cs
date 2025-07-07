@@ -9,5 +9,11 @@ namespace TSUApplicationApi.Services
         Task AddReviewAsync(LecturerReview review);
         Task<bool> LecturerExistsAsync(int lecturerId);
         Task<User?> GetUserByIdAsync(Guid userId);
+
+
+        Task<LecturerReview?> GetLecturerReviewByIdAsync(int reviewId);
+        Task UpdateLecturerReviewAsync(LecturerReview review);
+        Task<bool> DeleteLecturerReviewAsync(int reviewId);
+
     }
 }

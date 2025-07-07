@@ -54,6 +54,5 @@ namespace TSUApplicationApi.Controllers
             return Ok("You are Admin!");
         }
 
-
     }
 }

@@ -23,8 +23,9 @@ namespace TSUApplicationApi.Services
         public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit)
         {
             return await _context.FeedPosts
+                .Where(p => p.IsApproved)
                 .Include(p => p.User)
-                .Include(p => p.Comments)
+                .Include(p => p.Comments.Where(c => c.IsApproved))
                     .ThenInclude(c => c.User)
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip(offset)
@@ -66,5 +67,52 @@ namespace TSUApplicationApi.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
+
+        //--------------------------
+
+        public async Task<FeedPost?> GetPostByIdAsync(int postId)
+        {
+            return await _context.FeedPosts.FindAsync(postId);
+        }
+
+        public async Task UpdatePostAsync(FeedPost post)
+        {
+            _context.FeedPosts.Update(post);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeletePostAsync(int postId)
+        {
+            var post = await _context.FeedPosts.FindAsync(postId);
+            if (post == null)
+                return false;
+
+            _context.FeedPosts.Remove(post);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<FeedComment?> GetCommentByIdAsync(int commentId)
+        {
+            return await _context.FeedComments.FindAsync(commentId);
+        }
+
+        public async Task UpdateCommentAsync(FeedComment comment)
+        {
+            _context.FeedComments.Update(comment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteCommentAsync(int commentId)
+        {
+            var comment = await _context.FeedComments.FindAsync(commentId);
+            if (comment == null)
+                return false;
+
+            _context.FeedComments.Remove(comment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

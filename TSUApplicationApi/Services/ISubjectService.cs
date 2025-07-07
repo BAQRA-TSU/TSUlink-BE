@@ -13,5 +13,10 @@ namespace TSUApplicationApi.Services
         Task<(bool Success, string Message, FileDto? File)> UploadFileAsync(int subjectId, IFormFile file);
 
         Task<SubjectFile?> DownloadFileAsync(int fileId, int subjectId);
+
+        Task<SubjectReview?> GetSubjectReviewByIdAsync(int reviewId);
+        Task UpdateSubjectReviewAsync(SubjectReview review);
+        Task<bool> DeleteSubjectReviewAsync(int reviewId);
+
     }
 }

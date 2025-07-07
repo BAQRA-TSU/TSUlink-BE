@@ -44,7 +44,9 @@ namespace TSUApplicationApi.Services
                     FileUrl = $"/api/subjects/{subject.Id}/files/{f.Id}"
                 }).ToList(),
 
-                Reviews = subject.SubjectReviews.Select(r => new ReviewDto
+                Reviews = subject.SubjectReviews
+                .Where(r => r.IsApproved)
+                .Select(r => new ReviewDto
                 {
                     Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
                     Review = r.Text          // მიმოხილვის ტექსტი
@@ -190,6 +192,27 @@ namespace TSUApplicationApi.Services
             return await _context.SubjectFiles
                 .FirstOrDefaultAsync(f => f.Id == fileId && f.SubjectId == subjectId);
         }
+
+        //-----------------------------------------
+        public async Task<SubjectReview?> GetSubjectReviewByIdAsync(int reviewId)
+    => await _context.SubjectReviews.FindAsync(reviewId);
+
+        public async Task UpdateSubjectReviewAsync(SubjectReview review)
+        {
+            _context.SubjectReviews.Update(review);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteSubjectReviewAsync(int reviewId)
+        {
+            var review = await _context.SubjectReviews.FindAsync(reviewId);
+            if (review == null) return false;
+
+            _context.SubjectReviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
 
 

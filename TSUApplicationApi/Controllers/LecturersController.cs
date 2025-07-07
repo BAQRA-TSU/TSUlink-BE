@@ -67,5 +67,31 @@ namespace TSUApplicationApi.Controllers
             return Ok(reviewDto);
             //return Ok("Review saved successfully");
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("review/{reviewId}/approve")]
+        public async Task<IActionResult> ApproveLecturerReview(int reviewId)
+        {
+            var review = await _service.GetLecturerReviewByIdAsync(reviewId);
+            if (review == null)
+                return NotFound();
+
+            review.IsApproved = true;
+            await _service.UpdateLecturerReviewAsync(review);
+
+            return Ok("Review approved.");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("review/{reviewId}")]
+        public async Task<IActionResult> DeleteLecturerReview(int reviewId)
+        {
+            var success = await _service.DeleteLecturerReviewAsync(reviewId);
+            if (!success)
+                return NotFound();
+
+            return Ok("Review deleted.");
+        }
+
     }
 }
