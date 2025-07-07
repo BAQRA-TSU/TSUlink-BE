@@ -20,20 +20,59 @@ namespace TSUApplicationApi.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit)
+        //public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit)
+        //{
+        //    return await _context.FeedPosts
+        //        .Where(p => p.IsApproved)
+        //        .Include(p => p.User)
+        //        .Include(p => p.Comments.Where(c => c.IsApproved))
+        //            .ThenInclude(c => c.User)
+        //        .OrderByDescending(p => p.CreatedAt)
+        //        .Skip(offset)
+        //        .Take(limit)
+        //        .Select(p => new FeedPostWithCommentsDto
+        //        {
+        //            Id = p.Id,
+        //            Name = p.User.FirstName + " " + p.User.LastName, 
+        //            Text = p.Content,
+        //            Comments = p.Comments
+        //                .OrderBy(c => c.CreatedAt)
+        //                .Select(c => new FeedCommentDto
+        //                {
+        //                    Name = c.User.FirstName + " " + c.User.LastName,
+        //                    Text = c.Text
+        //                }).ToList()
+        //        })
+        //        .ToListAsync();
+        //}
+
+
+        public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit, string? role)
         {
-            return await _context.FeedPosts
-                .Where(p => p.IsApproved)
+            var query = _context.FeedPosts
                 .Include(p => p.User)
                 .Include(p => p.Comments.Where(c => c.IsApproved))
                     .ThenInclude(c => c.User)
+                .AsQueryable();
+
+            
+            if (role == "Admin")
+            {
+                query = query.Where(p => !p.IsApproved);
+            }
+            else
+            {
+                query = query.Where(p => p.IsApproved);
+            }
+
+            return await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip(offset)
                 .Take(limit)
                 .Select(p => new FeedPostWithCommentsDto
                 {
                     Id = p.Id,
-                    Name = p.User.FirstName + " " + p.User.LastName, 
+                    Name = p.User.FirstName + " " + p.User.LastName,
                     Text = p.Content,
                     Comments = p.Comments
                         .OrderBy(c => c.CreatedAt)

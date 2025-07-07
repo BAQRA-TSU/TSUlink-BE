@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TSUApplicationApi.DTOs;
 using TSUApplicationApi.Entities;
 using TSUApplicationApi.Services;
@@ -53,7 +54,9 @@ namespace TSUApplicationApi.Controllers
         [HttpGet("with-comments")]
         public async Task<IActionResult> GetPostsWithComments([FromQuery] int offset = 0, [FromQuery] int limit = 10)
         {
-            var posts = await _service.GetPostsWithCommentsAsync(offset, limit);
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value; //added
+
+            var posts = await _service.GetPostsWithCommentsAsync(offset, limit, role);
             return Ok(posts);
         }
 
