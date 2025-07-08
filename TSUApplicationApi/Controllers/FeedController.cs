@@ -105,17 +105,17 @@ namespace TSUApplicationApi.Controllers
             return Ok("Post deleted.");
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost("comments/{commentId}/approve")]
-        public async Task<IActionResult> ApproveComment(int commentId)
-        {
-            var comment = await _service.GetCommentByIdAsync(commentId);
-            if (comment == null) return NotFound();
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost("comments/{commentId}/approve")]
+        //public async Task<IActionResult> ApproveComment(int commentId)
+        //{
+        //    var comment = await _service.GetCommentByIdAsync(commentId);
+        //    if (comment == null) return NotFound();
 
-            comment.IsApproved = true;
-            await _service.UpdateCommentAsync(comment);
-            return Ok("Comment approved.");
-        }
+        //    comment.IsApproved = true;
+        //    await _service.UpdateCommentAsync(comment);
+        //    return Ok("Comment approved.");
+        //}
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("comments/{commentId}")]

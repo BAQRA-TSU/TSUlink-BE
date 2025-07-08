@@ -51,38 +51,39 @@ namespace TSUApplicationApi.Services
         {
             var query = _context.FeedPosts
                 .Include(p => p.User)
-                .Include(p => p.Comments.Where(c => c.IsApproved))
+                .Include(p => p.Comments)
                     .ThenInclude(c => c.User)
                 .AsQueryable();
 
-            
-            if (role == "Admin")
-            {
-                query = query.Where(p => !p.IsApproved);
-            }
-            else
+
+            if (role != "Admin")
             {
                 query = query.Where(p => p.IsApproved);
             }
 
-            return await query
+            var posts = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip(offset)
                 .Take(limit)
-                .Select(p => new FeedPostWithCommentsDto
-                {
-                    Id = p.Id,
-                    Name = p.User.FirstName + " " + p.User.LastName,
-                    Text = p.Content,
-                    Comments = p.Comments
-                        .OrderBy(c => c.CreatedAt)
-                        .Select(c => new FeedCommentDto
-                        {
-                            Name = c.User.FirstName + " " + c.User.LastName,
-                            Text = c.Text
-                        }).ToList()
-                })
                 .ToListAsync();
+
+            return posts.Select(p => new FeedPostWithCommentsDto
+            {
+                Id = p.Id,
+                Name = p.User.FirstName + " " + p.User.LastName,
+                Text = p.Content,
+                IsApproved = role == "Admin" ? p.IsApproved : null,
+                Comments = p.Comments
+            
+            .OrderBy(c => c.CreatedAt)
+            .Select(c => new FeedCommentDto
+            {
+                Id = c.Id,
+                Name = c.User.FirstName + " " + c.User.LastName,
+                Text = c.Text,
+                //IsApproved = role == "Admin" ? c.IsApproved : null // 
+            }).ToList()
+            }).ToList();
         }
 
         public async Task<FeedComment> AddCommentAsync(int postId, Guid userId, string text)

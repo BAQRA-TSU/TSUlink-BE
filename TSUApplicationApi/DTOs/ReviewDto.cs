@@ -1,8 +1,13 @@
-﻿namespace TSUApplicationApi.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace TSUApplicationApi.DTOs
 {
     public class ReviewDto
     {
         public string Name { get; set; }
         public string Review { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? IsApproved { get; set; } // Admin-სთვის გამოჩნდება
     }
 }

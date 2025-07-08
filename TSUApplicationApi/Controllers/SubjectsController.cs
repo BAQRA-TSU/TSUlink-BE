@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TSUApplicationApi.Data;
 using TSUApplicationApi.DTOs;
 using TSUApplicationApi.Entities;
@@ -25,7 +26,8 @@ namespace TSUApplicationApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSubject(int id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var result = await _service.GetByIdAsync(id, role);
             if (result == null)
                 return NotFound();
 

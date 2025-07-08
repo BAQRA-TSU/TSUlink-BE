@@ -16,7 +16,7 @@ namespace TSUApplicationApi.Services
             _environment = environment;
         }
 
-        public async Task<SubjectDetailDto?> GetByIdAsync(int id)
+        public async Task<SubjectDetailDto?> GetByIdAsync(int id, string? role = null)
         {
             var subject = await _context.Subjects
                 .Include(s => s.LecturerSubjects)
@@ -24,32 +24,41 @@ namespace TSUApplicationApi.Services
                 //.Include(s => s.Files)
                 .Include(s => s.SubjectReviews)
                 .ThenInclude(r => r.User)
-                .Include(s => s.Files)
+                //.Include(s => s.Files)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (subject == null)
                 return null;
 
+            var files = await _context.SubjectFiles
+        .Where(f => f.SubjectId == subject.Id)
+        .Select(f => new FileDto
+        {
+            FileName = f.FileName,
+            FileUrl = $"/api/subjects/{subject.Id}/files/{f.Id}"
+        }).ToListAsync();
 
             var dto = new SubjectDetailDto
             {
                 Name = subject.Name,
                 Description = subject.Description,
+                Files = files,
                 //Files = _mapper.Map<List<FileDto>>(subject.Files),
                 //Reviews = _mapper.Map<List<ReviewDto>>(subject.Reviews),
 
-                Files = subject.Files.Select(f => new FileDto
-                {
-                    FileName = f.FileName,
-                    FileUrl = $"/api/subjects/{subject.Id}/files/{f.Id}"
-                }).ToList(),
+                //Files = subject.Files.Select(f => new FileDto
+                //{
+                //    FileName = f.FileName,
+                //    FileUrl = $"/api/subjects/{subject.Id}/files/{f.Id}"
+                //}).ToList(),
 
                 Reviews = subject.SubjectReviews
-                .Where(r => r.IsApproved)
+                .Where(r => role == "Admin" || r.IsApproved)
                 .Select(r => new ReviewDto
                 {
                     Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
-                    Review = r.Text          // მიმოხილვის ტექსტი
+                    Review = r.Text,          // მიმოხილვის ტექსტი
+                    IsApproved = role == "Admin" ? r.IsApproved : null
                 }).ToList(),
                 Lecturers = new LecturerGroupedDto
                 {
