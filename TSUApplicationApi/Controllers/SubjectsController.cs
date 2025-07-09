@@ -27,7 +27,10 @@ namespace TSUApplicationApi.Controllers
         public async Task<IActionResult> GetSubject(int id)
         {
             var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            var result = await _service.GetByIdAsync(id, role);
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            Guid.TryParse(userIdStr, out var userId);
+
+            var result = await _service.GetByIdAsync(id, role, userId);
             if (result == null)
                 return NotFound();
 
@@ -117,16 +120,41 @@ namespace TSUApplicationApi.Controllers
             return Ok("Review approved.");
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("review/{reviewId}")]
+        //public async Task<IActionResult> DeleteSubjectReview(int reviewId)
+        //{
+        //    var success = await _service.DeleteSubjectReviewAsync(reviewId);
+        //    if (!success)
+        //        return NotFound();
+
+        //    return Ok("Review deleted.");
+        //}
+
         [HttpDelete("review/{reviewId}")]
         public async Task<IActionResult> DeleteSubjectReview(int reviewId)
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var parsedUserId))
+                return Unauthorized();
+
+            var review = await _service.GetSubjectReviewByIdAsync(reviewId);
+            if (review == null)
+                return NotFound();
+
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+
+            if (!isAdmin && review.UserId != parsedUserId)
+                return Forbid("You can only delete your own review.");
+
             var success = await _service.DeleteSubjectReviewAsync(reviewId);
             if (!success)
                 return NotFound();
 
             return Ok("Review deleted.");
         }
+
+
 
     }
 }

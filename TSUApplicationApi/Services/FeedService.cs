@@ -47,7 +47,7 @@ namespace TSUApplicationApi.Services
         //}
 
 
-        public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit, string? role)
+        public async Task<List<FeedPostWithCommentsDto>> GetPostsWithCommentsAsync(int offset, int limit, string? role, Guid? currentUserId = null)
         {
             var query = _context.FeedPosts
                 .Include(p => p.User)
@@ -73,6 +73,7 @@ namespace TSUApplicationApi.Services
                 Name = p.User.FirstName + " " + p.User.LastName,
                 Text = p.Content,
                 IsApproved = role == "Admin" ? p.IsApproved : null,
+                CanDelete = role == "Admin" || (currentUserId != null && p.UserId == currentUserId),
                 Comments = p.Comments
             
             .OrderBy(c => c.CreatedAt)
@@ -81,6 +82,7 @@ namespace TSUApplicationApi.Services
                 Id = c.Id,
                 Name = c.User.FirstName + " " + c.User.LastName,
                 Text = c.Text,
+                CanDelete = role == "Admin" || (currentUserId != null && c.UserId == currentUserId)
                 //IsApproved = role == "Admin" ? c.IsApproved : null // 
             }).ToList()
             }).ToList();

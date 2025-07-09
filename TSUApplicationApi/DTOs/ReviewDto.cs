@@ -9,5 +9,7 @@ namespace TSUApplicationApi.DTOs
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? IsApproved { get; set; } // Admin-სთვის გამოჩნდება
+
+        public bool CanDelete { get; set; }
     }
 }

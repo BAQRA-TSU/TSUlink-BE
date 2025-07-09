@@ -55,8 +55,10 @@ namespace TSUApplicationApi.Controllers
         public async Task<IActionResult> GetPostsWithComments([FromQuery] int offset = 0, [FromQuery] int limit = 10)
         {
             var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value; //added
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            Guid.TryParse(userIdStr, out var userId);
 
-            var posts = await _service.GetPostsWithCommentsAsync(offset, limit, role);
+            var posts = await _service.GetPostsWithCommentsAsync(offset, limit, role, userId);
             return Ok(posts);
         }
 
@@ -95,15 +97,40 @@ namespace TSUApplicationApi.Controllers
             return Ok("Post approved.");
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("{postId}")]
+        //public async Task<IActionResult> DeletePost(int postId)
+        //{
+        //    var success = await _service.DeletePostAsync(postId);
+        //    if (!success) return NotFound();
+
+        //    return Ok("Post deleted.");
+        //}
+
         [HttpDelete("{postId}")]
         public async Task<IActionResult> DeletePost(int postId)
         {
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+                return Unauthorized();
+
+            var post = await _service.GetPostByIdAsync(postId);
+            if (post == null)
+                return NotFound();
+
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+
+            if (!isAdmin && post.UserId != userId)
+                return Forbid("You can only delete your own post.");
+
             var success = await _service.DeletePostAsync(postId);
-            if (!success) return NotFound();
+            if (!success)
+                return NotFound();
 
             return Ok("Post deleted.");
         }
+
+
 
         //[Authorize(Roles = "Admin")]
         //[HttpPost("comments/{commentId}/approve")]
@@ -117,15 +144,41 @@ namespace TSUApplicationApi.Controllers
         //    return Ok("Comment approved.");
         //}
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("comments/{commentId}")]
+        //public async Task<IActionResult> DeleteComment(int commentId)
+        //{
+        //    var success = await _service.DeleteCommentAsync(commentId);
+        //    if (!success) return NotFound();
+
+        //    return Ok("Comment deleted.");
+        //}
+
         [HttpDelete("comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+                return Unauthorized();
+
+            var comment = await _service.GetCommentByIdAsync(commentId);
+            if (comment == null)
+                return NotFound();
+
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+
+            if (!isAdmin && comment.UserId != userId)
+                return Forbid("You can only delete your own comment.");
+
             var success = await _service.DeleteCommentAsync(commentId);
-            if (!success) return NotFound();
+            if (!success)
+                return NotFound();
 
             return Ok("Comment deleted.");
         }
+
+
+
 
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TSUApplicationApi.Data;
 using TSUApplicationApi.DTOs;
 using TSUApplicationApi.Entities;
@@ -25,7 +26,11 @@ namespace TSUApplicationApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetLecturer(int id)
         {
-            var result = await _service.GetByIdAsync(id);
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            Guid.TryParse(userIdStr, out var userId);
+
+            var result = await _service.GetByIdAsync(id, role, userId);
             if (result == null)
                 return NotFound();
 
@@ -82,10 +87,33 @@ namespace TSUApplicationApi.Controllers
             return Ok("Review approved.");
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("review/{reviewId}")]
+        //public async Task<IActionResult> DeleteLecturerReview(int reviewId)
+        //{
+        //    var success = await _service.DeleteLecturerReviewAsync(reviewId);
+        //    if (!success)
+        //        return NotFound();
+
+        //    return Ok("Review deleted.");
+        //}
+
         [HttpDelete("review/{reviewId}")]
         public async Task<IActionResult> DeleteLecturerReview(int reviewId)
         {
+            var userIdStr = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            if (string.IsNullOrEmpty(userIdStr) || !Guid.TryParse(userIdStr, out var userId))
+                return Unauthorized();
+
+            var review = await _service.GetLecturerReviewByIdAsync(reviewId);
+            if (review == null)
+                return NotFound();
+
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
+
+            if (!isAdmin && review.UserId != userId)
+                return Forbid("You can only delete your own review.");
+
             var success = await _service.DeleteLecturerReviewAsync(reviewId);
             if (!success)
                 return NotFound();

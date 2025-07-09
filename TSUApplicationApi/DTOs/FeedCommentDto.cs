@@ -8,6 +8,8 @@ namespace TSUApplicationApi.DTOs
         public string Name { get; set; }
         public string Text { get; set; }
 
+        public bool CanDelete { get; set; }
+
         //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         //public bool? IsApproved { get; set; }
     }

@@ -16,7 +16,7 @@ namespace TSUApplicationApi.Services
             _environment = environment;
         }
 
-        public async Task<SubjectDetailDto?> GetByIdAsync(int id, string? role = null)
+        public async Task<SubjectDetailDto?> GetByIdAsync(int id, string? role = null, Guid? currentUserId = null)
         {
             var subject = await _context.Subjects
                 .Include(s => s.LecturerSubjects)
@@ -58,7 +58,8 @@ namespace TSUApplicationApi.Services
                 {
                     Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
                     Review = r.Text,          // მიმოხილვის ტექსტი
-                    IsApproved = role == "Admin" ? r.IsApproved : null
+                    IsApproved = role == "Admin" ? r.IsApproved : null,
+                    CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId)
                 }).ToList(),
                 Lecturers = new LecturerGroupedDto
                 {

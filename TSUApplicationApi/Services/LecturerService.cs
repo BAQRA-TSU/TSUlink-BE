@@ -15,7 +15,7 @@ namespace TSUApplicationApi.Services
             _context = context;
         }
 
-        public async Task<LecturerDetailDto> GetByIdAsync(int id)
+        public async Task<LecturerDetailDto> GetByIdAsync(int id, string? role = null, Guid? currentUserId = null)
         {
             var lecturer = await _context.Lecturers
                 .Include(l => l.LecturerSubjects)
@@ -45,8 +45,12 @@ namespace TSUApplicationApi.Services
                     Office = lecturer.Office
                 },
                 Reviews = lecturer.LecturerReviews
-                    .Where(r => r.IsApproved)
-                    .Select(r => new ReviewDto { Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text })
+                    .Where(r => role == "Admin" || r.IsApproved /*|| (currentUserId != null && r.UserId == currentUserId)*/)
+                    .Select(r => new ReviewDto { Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text,
+                        IsApproved = role == "Admin" ? r.IsApproved : null,
+                        CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId)
+
+                    })
                     .ToList()
             };
         }

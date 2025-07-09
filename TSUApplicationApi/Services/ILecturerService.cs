@@ -1,11 +1,12 @@
-﻿using TSUApplicationApi.DTOs;
+﻿using System.Data;
+using TSUApplicationApi.DTOs;
 using TSUApplicationApi.Entities;
 
 namespace TSUApplicationApi.Services
 {
     public interface ILecturerService
     {
-        Task<LecturerDetailDto> GetByIdAsync(int id);
+        Task<LecturerDetailDto> GetByIdAsync(int id, string? role = null, Guid? currentUserId = null);
         Task AddReviewAsync(LecturerReview review);
         Task<bool> LecturerExistsAsync(int lecturerId);
         Task<User?> GetUserByIdAsync(Guid userId);
