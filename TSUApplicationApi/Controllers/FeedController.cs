@@ -79,8 +79,10 @@ namespace TSUApplicationApi.Controllers
             var comment = await _service.AddCommentAsync(postId, parsedUserId, dto.Text);
             return Ok(new FeedCommentDto
             {
+                Id = comment.Id,
                 Name = comment.User.FirstName + " " + comment.User.LastName,
-                Text = comment.Text
+                Text = comment.Text,
+                CanDelete = true
             });
         }
          //------------------------------//

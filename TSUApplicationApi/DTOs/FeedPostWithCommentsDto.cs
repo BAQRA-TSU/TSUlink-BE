@@ -11,6 +11,8 @@ namespace TSUApplicationApi.DTOs
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? IsApproved { get; set; }
 
+        public string Status { get; set; }
+
         public bool CanDelete { get; set; }
         public List<FeedCommentDto> Comments { get; set; } = new();
     }

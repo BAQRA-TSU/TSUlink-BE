@@ -65,8 +65,11 @@ namespace TSUApplicationApi.Controllers
 
             var reviewDto = new ReviewDto
             {
+                Id = review.Id,
                 Name = $"{user.FirstName} {user.LastName}",
-                Review = review.Text
+                Review = review.Text,
+                CanDelete = true,
+                Status = "pending"
             };
 
             return Ok(reviewDto);

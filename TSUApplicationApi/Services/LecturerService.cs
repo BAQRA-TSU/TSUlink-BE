@@ -45,11 +45,11 @@ namespace TSUApplicationApi.Services
                     Office = lecturer.Office
                 },
                 Reviews = lecturer.LecturerReviews
-                    .Where(r => role == "Admin" || r.IsApproved /*|| (currentUserId != null && r.UserId == currentUserId)*/)
-                    .Select(r => new ReviewDto { Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text,
+                    .Where(r => role == "Admin" || r.IsApproved || (currentUserId != null && r.UserId == currentUserId))
+                    .Select(r => new ReviewDto { Id = r.Id, Name = /*r.User.Username*/$"{r.User.FirstName} {r.User.LastName}",Review = r.Text,
                         IsApproved = role == "Admin" ? r.IsApproved : null,
-                        CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId)
-
+                        CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId),
+                        Status = r.IsApproved ? "approved" : (r.UserId == currentUserId ? "pending" : null)
                     })
                     .ToList()
             };

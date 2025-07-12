@@ -53,13 +53,15 @@ namespace TSUApplicationApi.Services
                 //}).ToList(),
 
                 Reviews = subject.SubjectReviews
-                .Where(r => role == "Admin" || r.IsApproved)
+                .Where(r => role == "Admin" || r.IsApproved || (currentUserId != null && r.UserId == currentUserId))
                 .Select(r => new ReviewDto
                 {
+                    Id = r.Id,
                     Name = /*r.User.Username,*/ $"{r.User.FirstName} {r.User.LastName}", // სრული სახელი
                     Review = r.Text,          // მიმოხილვის ტექსტი
                     IsApproved = role == "Admin" ? r.IsApproved : null,
-                    CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId)
+                    CanDelete = role == "Admin" || (currentUserId != null && r.UserId == currentUserId),
+                    Status = r.IsApproved ? "approved" : (r.UserId == currentUserId ? "pending" : null)
                 }).ToList(),
                 Lecturers = new LecturerGroupedDto
                 {

@@ -58,7 +58,7 @@ namespace TSUApplicationApi.Services
 
             if (role != "Admin")
             {
-                query = query.Where(p => p.IsApproved);
+                query = query.Where(p => p.IsApproved || p.UserId == currentUserId);
             }
 
             var posts = await query
@@ -72,7 +72,8 @@ namespace TSUApplicationApi.Services
                 Id = p.Id,
                 Name = p.User.FirstName + " " + p.User.LastName,
                 Text = p.Content,
-                IsApproved = role == "Admin" ? p.IsApproved : null,
+                IsApproved = p.IsApproved,
+                Status = p.IsApproved ? "approved" : (p.UserId == currentUserId ? "pending" : null),
                 CanDelete = role == "Admin" || (currentUserId != null && p.UserId == currentUserId),
                 Comments = p.Comments
             
