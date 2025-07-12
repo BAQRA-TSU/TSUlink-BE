@@ -72,7 +72,8 @@ namespace TSUApplicationApi.Services
                 Id = p.Id,
                 Name = p.User.FirstName + " " + p.User.LastName,
                 Text = p.Content,
-                IsApproved = p.IsApproved,
+                //IsApproved = p.IsApproved,
+                IsApproved = role == "Admin" ? p.IsApproved : null,
                 Status = p.IsApproved ? "approved" : (p.UserId == currentUserId ? "pending" : null),
                 CanDelete = role == "Admin" || (currentUserId != null && p.UserId == currentUserId),
                 Comments = p.Comments
