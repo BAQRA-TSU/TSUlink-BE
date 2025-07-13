@@ -70,7 +70,7 @@ namespace TSUApplicationApi.Services
                         .Select(ls => new LecturerDto
                         {
                             Id = ls.Lecturer.Id,
-                            Name = $"{ls.Lecturer.FullName} {ls.Lecturer.Id}"
+                            Name = ls.Lecturer.FullName
                         })
                         .ToList(),
 
@@ -79,7 +79,7 @@ namespace TSUApplicationApi.Services
                         .Select(ls => new LecturerDto
                         {
                             Id = ls.Lecturer.Id,
-                            Name = $"{ls.Lecturer.FullName} {ls.Lecturer.Id}"
+                            Name = ls.Lecturer.FullName
                         })
                         .ToList(),
 
@@ -88,7 +88,7 @@ namespace TSUApplicationApi.Services
                         .Select(ls => new LecturerDto
                         {
                             Id = ls.Lecturer.Id,
-                            Name = $"{ls.Lecturer.FullName}   {ls.Lecturer.Id}"
+                            Name = ls.Lecturer.FullName
                         })
                         .ToList(),
                 }

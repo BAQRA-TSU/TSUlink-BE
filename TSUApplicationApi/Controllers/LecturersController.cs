@@ -115,7 +115,7 @@ namespace TSUApplicationApi.Controllers
             var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin");
 
             if (!isAdmin && review.UserId != userId)
-                return Forbid("You can only delete your own review.");
+                return StatusCode(StatusCodes.Status403Forbidden, "You can only delete your own review.");
 
             var success = await _service.DeleteLecturerReviewAsync(reviewId);
             if (!success)
