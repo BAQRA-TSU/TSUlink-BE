@@ -46,6 +46,8 @@ namespace TSUApplicationApi.Controllers
                 Id = post.Id,
                 Name = $"{user.FirstName} {user.LastName}",
                 Text = post.Content,
+                CanDelete = true,
+                Status = "pending"
             };
             return Ok(feedPostDto);
             //return Ok("Post created successfully");
