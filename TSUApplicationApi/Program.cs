@@ -83,6 +83,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
+app.UseMiddleware<TSUApplicationApi.Middlewares.ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
