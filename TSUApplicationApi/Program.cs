@@ -7,6 +7,7 @@ using System.Text;
 using TSUApplicationApi.Data;
 using TSUApplicationApi.Services;
 using AutoMapper;
+using TSUApplicationApi.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,10 +61,17 @@ builder.Services.AddCors(options =>
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<ILecturerService, LecturerService>();
 builder.Services.AddScoped<IFeedService, FeedService>();
+builder.Services.AddScoped<IFeedRepository, FeedRepository>();
+
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+//builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
 
 var app = builder.Build();
 
